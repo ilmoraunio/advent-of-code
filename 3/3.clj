@@ -8,6 +8,16 @@
            (= (mod (Math/floor sqrt) 2) 1.0) (+ (Math/floor sqrt) 2)
            :else                             (+ (Math/floor sqrt) 1)))))
 
+(defn center-line-squares [square]
+  (let [n      (get-elements-in-edge square)
+        step   (dec (get-elements-in-edge square))
+        prefix (dec (/ (dec n) 2))
+        start-square 2]
+    [(+ prefix start-square)
+     (+ prefix start-square step)
+     (+ prefix start-square step step)
+     (+ prefix start-square step step step)]))
+
 (defn get-distance-to-center-line [square]
   ;; determine the elements-in-edge
   ;; calculate the center line square values for that layer (ie. [2, 4, 6, 8] when get-elements-in-edge is 3)
