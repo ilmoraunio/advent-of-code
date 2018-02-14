@@ -18,12 +18,19 @@
          (map #(zipmap [:program :weight :children] %))
          (reduce (fn [a b] (conj a (transform-map transformation-map b))) (empty re-seqs)))))
 
-(parse-tower-input input)
+(defn find-root-node [programs]
+  (let [haystack (filter :children programs)]
+    (loop [root-node-candidate (first (remove :children programs))
+           [{:keys [program children] :as haystraw} & rst] haystack]
+      (if (some #{(:program root-node-candidate)} children)
+        (recur haystraw haystack)
+        (if (empty? rst)
+          root-node-candidate
+          (recur root-node-candidate rst))))))
 
-;; 1. find :program where :children is nil
-;; 2. find :program where step 1's :program is contained in :children
-;;;; if found, repeat step 2
-;;;; else return :program from previous step 2
+(time (find-root-node (parse-tower-input input)))
+;; "Elapsed time: 13.455274 msecs"
+;; {:program "svugo", :weight 32, :children ["xolvnpy" "gjxqx" "gtzxxav" "njorjq" "qpiklvf"]}
 
 ;; playground
 
