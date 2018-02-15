@@ -3,7 +3,7 @@
 (defn difference-vector [v]
   (loop [diff-v (mapv (fn [_] constantly 0) v)
          n (apply max v)
-         idx (drop (inc (.indexOf v n)) (cycle (range 0 (count v))))]
+         idx (drop (inc (.indexOf v n)) (cycle (range 0 (count v))))] ;; eg. (0 1 2 3 0 1 2 3 ...)
     (if (zero? n)
       diff-v
       (recur (update diff-v (first idx) inc) (dec n) (rest idx)))))
@@ -26,3 +26,18 @@
 ;; user=> (time (play-until-loops [14 0 15  12  11  11  3 5 1 6 8 4 9 1 8 4 5 20 4 5 1 0 200 4 3 20 5 6 8000 500000 20 100 20]))
 ;; "Elapsed time: 13074.416489 msecs"
 ;; 849
+
+(defn play-until-loops-part-II [v]
+  (loop [states #{}
+         new-state (make-new-state v)]
+    (if (states new-state)
+      (loop [loop-states #{}
+             new-state-in-loop (make-new-state new-state)]
+        (if (loop-states new-state-in-loop)
+          (count loop-states)
+          (recur (conj loop-states new-state-in-loop) (make-new-state new-state-in-loop))))
+      (recur (conj states new-state) (make-new-state new-state)))))
+
+;; user=> (time (play-until-loops-part-II [14  0 15  12  11  11  3 5 1 6 8 4 9 1 8 4]))
+;; "Elapsed time: 552.727495 msecs"
+;; 1037
