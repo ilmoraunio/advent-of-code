@@ -32,19 +32,27 @@
 ;; "Elapsed time: 13.455274 msecs"
 ;; {:program "svugo", :weight 32, :children ["xolvnpy" "gjxqx" "gtzxxav" "njorjq" "qpiklvf"]}
 
-;; playground
 
-(def foo 
-'({:program "cntj", :weight 57, :children nil}
-  {:program "gyxo", :weight 61, :children nil} 
-  {:program "ugml", :weight 68, :children ["gyxo" "ebii" "jptl"]} 
-  {:program "jptl", :weight 61, :children nil} 
-  {:program "tknk", :weight 41, :children ["ugml" "padx" "fwft"]}
-  {:program "padx", :weight 45, :children ["pbga" "havc" "qoyq"]}
-  {:program "qoyq", :weight 66, :children nil}
-  {:program "fwft", :weight 72, :children ["ktlj" "cntj" "xhth"]}
-  {:program "ktlj", :weight 57, :children nil}
-  {:program "havc", :weight 66, :children nil}
-  {:program "ebii", :weight 61, :children nil}
-  {:program "xhth", :weight 57, :children nil}
-  {:program "pbga", :weight 66, :children nil}))
+;; part II
+;; the right solution is 1152 (program name 'sphbbz')
+;; still todo: calculate the difference and subtract from 'sphbbz's :weight
+
+(defn find-node [input program-name]
+  (first (filter #(->> % :program (= program-name)) input)))
+
+(defn disc-weights [input {:keys [children] :as program}]
+  (if children
+    (for [child (map (partial find-node input) children)]
+      (let [v (cons (:weight child) (disc-weights input child))
+            reduced-v (apply + (flatten v))]
+        (when (and (not-empty (rest v))
+                 (apply not= (rest v)))
+          (prn "These children / this node is out of balance" children child (rest v)))
+        reduced-v))
+    '()))
+
+(time (disc-weights (parse-tower-input input) (find-root-node (parse-tower-input input))))
+;; "Elapsed time: 18.11239 msecs"
+;; "These children / this node is out of balance" ["yruivis" "rizjob" "qsfwl" "asckjlv" "sfqwrge" "bncdhrm"] {:program "yruivis", :weight 2760, :children ["oxipms" "ggpau" "sphbbz"]} (2671 2671 2680)
+;; "These children / this node is out of balance" ["xolvnpy" "gjxqx" "gtzxxav" "njorjq" "qpiklvf"] {:program "gjxqx", :weight 14, :children ["yruivis" "rizjob" "qsfwl" "asckjlv" "sfqwrge" "bncdhrm"]} (10782 10773 10773 10773 10773 10773)
+;; (64652 64661 64652 64652 64652)
