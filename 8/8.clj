@@ -31,12 +31,12 @@
 (def register
   (apply hash-map (interleave (map :register rules-map) (repeat 0))))
 
-(defn create-rule [register
-                   {register-key :register :keys [operator
+(defn create-rule [{register-key :register :keys [operator
                                                   parameter
                                                   condition-register
                                                   condition-operator
-                                                  condition-parameter] :as rule}]
+                                                  condition-parameter] :as rule}
+                   register]
   (let  [condition-register-value (get register condition-register)]
      (if (condition-operator condition-register-value condition-parameter)
        (update register register-key #(operator % parameter))
@@ -46,7 +46,7 @@
  (loop [[rule & rst] rules-map
         register register]
   (if rule 
-    (recur rst (create-rule register rule))
+    (recur rst (create-rule rule register))
     register)))
 
 (reduce (fn [[_ v1 :as m1] 
