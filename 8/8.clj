@@ -49,7 +49,24 @@
     (recur rst (create-rule rule register))
     register)))
 
-(reduce (fn [[_ v1 :as m1] 
-             [_ v2 :as m2]] 
-             (if (> v1 v2) m1 m2)) (apply-business-rules rules-map register))
+(defn highest-valued-map-entry [coll]
+  (reduce (fn [[_ v1 :as m1] 
+               [_ v2 :as m2]] 
+            (if (> v1 v2) m1 m2)) coll))
 
+(highest-valued-map-entry (apply-business-rules rules-map register))
+
+;; part II
+
+(defn apply-business-rules-part-II [rules-map register]
+ (loop [[rule & rst] rules-map
+        register register
+        registers []]
+  (if rule 
+    (let [new-rule (create-rule rule register)]
+      (recur rst new-rule (conj registers new-rule)))
+    registers)))
+
+(->> (apply-business-rules-part-II rules-map register)
+     (map highest-valued-map-entry)
+     (highest-valued-map-entry))
