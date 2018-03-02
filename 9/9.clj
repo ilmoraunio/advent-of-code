@@ -63,3 +63,10 @@
 (calculate-score (inner-form (sanitize input)))
 ;; "Elapsed time: 32.204785 msecs"
 ;; 10050
+
+
+;; part II
+(time (reduce + (map (comp count second)
+                     (re-seq #"<(.*?)>" (clojure.string/replace input #"!." "")))))
+;; "Elapsed time: 0.914314 msecs"
+;; 4482
