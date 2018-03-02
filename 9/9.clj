@@ -28,16 +28,38 @@
     (is (nil? (re-find #"([^{},])" (sanitize input))))))
 
 (defn inner-form [input]
+  "See 9-inner-form.txt for example output"
   (-> input 
       (clojure.string/replace #"\{" "[")
       (clojure.string/replace #"\}" "]")
       read-string))
 
-;; (inner-form (sanitize input))
+(defn calculate-score [inner-form]
+  (loop [[group & groups :as form] inner-form
+         depth-level 2
+         breadth-counter (count inner-form)
+         total-score (if (nil? inner-form) 0 1)]
+    (cond
+      (nil? group)
+        total-score
+      (and (empty? group) (empty? groups))
+        (if (= breadth-counter 0)
+          (+ total-score (inc depth-level))
+          (+ total-score depth-level))
+      :else
+        (if (= breadth-counter 0)
+          (recur (concat groups group) (inc depth-level) (count groups)        (+ total-score (inc depth-level)))
+          (recur (concat groups group) depth-level       (dec breadth-counter) (+ total-score depth-level))))))
 
-(loop [[group & rst :as form] (inner-form (sanitize input))
-       depth-level 1
-       total-score 0]
-  (prn "group" (clojure.pprint/pprint group))
-  (prn "rst" (clojure.pprint/pprint rst))
-  )
+
+(testing "scoring points"
+  (is (= (calculate-score [])          1))
+  (is (= (calculate-score [[]])        3))
+  (is (= (calculate-score [[] []])     5))
+  (is (= (calculate-score [[[]]])      6))
+  (is (= (calculate-score [[[]] []])   8))
+  (is (= (calculate-score [[[]] [[]]]) 11)))
+
+(calculate-score (inner-form (sanitize input)))
+;; "Elapsed time: 32.204785 msecs"
+;; 10050
